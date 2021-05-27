@@ -1,0 +1,32 @@
+stages:
+  - build
+  - deploy
+
+build_app:
+  stage: build
+  image: 14-alpine3.13
+  script:
+  - npm install
+  cache:
+    key: "node_modules"
+    paths:
+      - node_modules/
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - .
+  only:
+  - staging
+
+deploy:
+  stage: deploy
+  script:
+    - . /opt/scripts/before.sh
+    - . /opt/scripts/deploy.sh
+    - . /opt/scripts/after.sh
+  dependencies:
+    - build_app
+  tags:
+    - deploy_lnx_multi_runner
+  only:
+    - staging

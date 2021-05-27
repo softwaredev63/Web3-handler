@@ -1,0 +1,21 @@
+{
+  "name": "2localweb3handler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.lynxsolutions.eu:lynx/2localweb3handler.git"
+  },
+  "author": "szabolcs.szanto@lynxsolutions.eu",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "web3": "^1.3.6"
+  }
+}
