@@ -19,7 +19,7 @@ router.post("/get-wallet", function (req, res) {
   const encryptedData = encrypt(newWallet.privateKey, pass);
 
   res.json({
-    publicKey: newWallet.address,
+    address: newWallet.address,
     privateKey: encryptedData.content,
     iv: encryptedData.iv,
   });
