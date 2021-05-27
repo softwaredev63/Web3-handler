@@ -4,7 +4,7 @@ stages:
 
 build_app:
   stage: build
-  image: node:12-alpine3.11
+  image: node:14-alpine3.13
   script:
   - npm install
   cache:
