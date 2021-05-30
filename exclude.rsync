@@ -1,0 +1,12 @@
+README.md
+.git
+.git/*
+.gitignore
+.gitlab-ci.yml
+exclude.rsync
+.gitlab-ci.yml
+.ssh
+.htaccess
+scss
+.env
+.env.example
