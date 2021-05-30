@@ -48,7 +48,7 @@ router.post("/send-token", async (req, res) => {
   res.json(transaction);
 });
 
-router.post("/elb-status", (req, res) => {
+router.get("/elb-status", (req, res) => {
   res.json({ everything: "OK" });
 });
 
