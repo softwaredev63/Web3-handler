@@ -27,14 +27,14 @@ router.post("/get-wallet", async (req, res) => {
 
 /* POST Send tokens to user*/
 router.post("/send-token", async (req, res) => {
-  const {sender_private_key, address, amount} = req.body;
-  if (!sender_private_key || !address || !amount) {
+  const {sender_private_key, address, amount, gas} = req.body;
+  if (!sender_private_key || !address || !amount || !gas) {
     res.status(400);
     res.send("Invalid data.");
     return;
   }
 
-  const transaction = await wallet.sendTokenToUser(sender_private_key, address, amount);
+  const transaction = await wallet.sendTokenToUser(sender_private_key, address, amount, gas);
 
   res.json(transaction);
 });

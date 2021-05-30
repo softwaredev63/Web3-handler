@@ -25,7 +25,7 @@ const generateWallet = () => {
  * @param amount
  * @returns {Promise<{error: {}, transactionHash: null}>}
  */
-const sendTokenToUser = async (sender_private_key, toAddress, amount) => {
+const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
 
     let response = {
         transactionHash: null,
@@ -62,7 +62,7 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount) => {
         const rawTransactionObject = {
             to: contractAddress,
             data: encodedContractData,
-            gas: "50000",
+            gas: gas,
         }
 
         /**
