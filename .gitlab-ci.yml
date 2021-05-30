@@ -51,7 +51,7 @@ aws-get-docker-login:
   tags:
   - aws-cli
   only:
-  - tags
+  - master
 
 docker-api-aws-push:
   dependencies:
