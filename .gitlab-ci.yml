@@ -1,4 +1,5 @@
 stages:
+  - config
   - build
   - deploy
 
@@ -30,3 +31,41 @@ deploy:
     - deploy_lnx_multi_runner
   only:
     - staging
+
+
+aws-get-docker-login:
+  script:
+  - mkdir ~/.aws
+  - ""
+  - echo "[default]" > ~/.aws/credentials
+  - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+  - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+  - echo "[default]" > ~/.aws/config
+  - echo "region = eu-central-1" >> ~/.aws/config
+  - aws ecr get-login --no-include-email --region eu-central-1 --profile default > aws-docker-repository-login-command
+  stage: config
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - aws-docker-repository-login-command
+  tags:
+  - aws-cli
+  only:
+  - tags
+
+docker-api-aws-push:
+  dependencies:
+  - aws-get-docker-login
+  script:
+  - docker build -t 2local-node .
+  - ""
+  - . ./aws-docker-repository-login-command
+  - docker tag 2local-node:latest 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:latest
+  - docker push 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:latest
+  stage: deploy
+  services:
+  - docker:dind
+  tags:
+  - docker-in-docker
+  only:
+  - master

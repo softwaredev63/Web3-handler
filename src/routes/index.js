@@ -17,7 +17,6 @@ router.post("/get-wallet", async (req, res) => {
 
   const newWallet = await wallet.generateWallet();
 
-
   const kmsEncrypted = await kms.encryptAndStoreToKMS(newWallet.privateKey);
 
   const encryptedData = encrypt(newWallet.privateKey, pass);
@@ -26,7 +25,7 @@ router.post("/get-wallet", async (req, res) => {
     address: newWallet.address,
     privateKey: encryptedData.content,
     iv: encryptedData.iv,
-    doubleEncrypted: kmsEncrypted
+    doubleEncrypted: kmsEncrypted,
   });
 });
 
@@ -47,6 +46,10 @@ router.post("/send-token", async (req, res) => {
   );
 
   res.json(transaction);
+});
+
+router.post("/elb-status", (req, res) => {
+  res.json({ everything: "OK" });
 });
 
 module.exports = router;
