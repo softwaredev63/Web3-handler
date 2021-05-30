@@ -13,6 +13,7 @@
   "author": "szabolcs.szanto@lynxsolutions.eu",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.918.0",
     "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "dotenv": "^10.0.0",

@@ -8,3 +8,5 @@ exclude.rsync
 .ssh
 .htaccess
 scss
+.env
+.env.example
