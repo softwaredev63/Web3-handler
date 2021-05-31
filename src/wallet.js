@@ -48,11 +48,35 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
         const L2LContract = new web3.eth.Contract(l2lContractABI, contractAddress);
 
         /**
+         * Checks the sender address balance
+         */
+        const senderBalance = await L2LContract.methods.balanceOf(senderAddress).call();
+
+        /**
+         * Converts amount to wei
+         *
+         * @type {BN}
+         */
+        const amountInWei = web3.utils.toWei(amount, "ether");
+
+        /**
          * Encode the token contract transfer function
          *
          * @type {string}
          */
-        const encodedContractData = L2LContract.methods.transfer(toAddress, web3.utils.toWei(amount, "ether")).encodeABI();
+        const encodedContractData = await L2LContract.methods.transfer(toAddress, amountInWei).encodeABI();
+
+        /**
+         * Estimate gas price for current transfer
+         *
+         * @type {BigNumber | number}
+         */
+        const currentGasEstimation = await L2LContract.methods.transfer(toAddress,amountInWei).estimateGas();
+
+        /**
+         * Approve the transaction
+         */
+        const transactionApproved = await L2LContract.methods.approve(toAddress, amountInWei).call();
 
         /**
          * Defines the raw transaction object
@@ -84,24 +108,31 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
             return web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
         }
 
-        /**
-         * Handles signing and sending transaction
-         */
-        await signTransaction()
-            .then(async (signedTransaction) => {
-                await sendTransaction(signedTransaction)
-                    .then((transactionReceipt) => {
-                        const {transactionHash} = transactionReceipt;
-                        response.transactionHash = transactionHash;
-                    })
-                    .catch((sendError) => {
-                        response.error.send = sendError.message;
-                    })
-            })
-            .catch(signError => {
-                response.error.sign = signError.message;
-            });
-
+        if(currentGasEstimation > gas) {
+            response.error.gas = `Gas too low.You have to set minim gas to: ${currentGasEstimation}`;
+        } else if(senderBalance < amountInWei) {
+            response.error.balance = "Your token balance is too low."
+        } else if (!transactionApproved) {
+            response.error.send = "Transaction is not approved";
+        } else {
+            /**
+             * Handles signing and sending transaction
+             */
+            await signTransaction()
+                .then(async (signedTransaction) => {
+                    await sendTransaction(signedTransaction)
+                        .then((transactionReceipt) => {
+                            const {transactionHash} = transactionReceipt;
+                            response.transactionHash = transactionHash;
+                        })
+                        .catch((sendError) => {
+                            response.error.send = sendError.message;
+                        })
+                })
+                .catch(signError => {
+                    response.error.sign = signError.message;
+                });
+        }
     } catch (catchError) {
         response.error.catch = catchError.message;
     } finally {
