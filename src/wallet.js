@@ -111,6 +111,7 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
         if(currentGasEstimation > gas) {
             response.error.gas = `Gas too low.You have to set minim gas to: ${currentGasEstimation}`;
         } else if(senderBalance < amountInWei) {
+            console.log(senderBalance, amountInWei, senderBalance < amountInWei);
             response.error.balance = "Your token balance is too low."
         } else if (!transactionApproved) {
             response.error.send = "Transaction is not approved";
