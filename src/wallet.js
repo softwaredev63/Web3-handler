@@ -50,14 +50,14 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
         /**
          * Checks the sender address balance
          */
-        const senderBalance = parseFloat(await L2LContract.methods.balanceOf(senderAddress).call());
+        const senderBalance = BigInt(await L2LContract.methods.balanceOf(senderAddress).call());
 
         /**
          * Converts amount to wei
          *
          * @type {BN}
          */
-        const amountInWei = parseFloat(web3.utils.toWei(amount, "ether"));
+        const amountInWei = BigInt(web3.utils.toWei(amount, "ether"));
 
         /**
          * Encode the token contract transfer function
