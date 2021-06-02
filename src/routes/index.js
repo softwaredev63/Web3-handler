@@ -4,7 +4,23 @@ const router = express.Router();
 const wallet = require("../wallet");
 const kms = require("../kms");
 
-const { encrypt } = require("../crypto");
+const { encrypt, decrypt } = require("../crypto");
+
+/* POST Private key decryptor. */
+router.post("/decrypt-key", async (req, res) => {
+  const { password: pass, iv, privateKey } = req.body;
+  if (!pass || !iv || !privateKey) {
+    res.status(400);
+    res.send("Invalid data.");
+    return;
+  }
+
+  const decrypted = decrypt(privateKey, pass, iv);
+
+  res.json({
+    privateKey: decrypted
+  });
+});
 
 /* POST Wallet creator. */
 router.post("/get-wallet", async (req, res) => {

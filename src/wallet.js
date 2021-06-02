@@ -50,33 +50,33 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
         /**
          * Checks the sender address balance
          */
-        const senderBalance = await L2LContract.methods.balanceOf(senderAddress).call();
+        const senderBalance = BigInt(await L2LContract.methods.balanceOf(senderAddress).call());
 
         /**
          * Converts amount to wei
          *
          * @type {BN}
          */
-        const amountInWei = web3.utils.toWei(amount, "ether");
+        const amountInWei = BigInt(web3.utils.toWei(amount, "ether"));
 
         /**
          * Encode the token contract transfer function
          *
          * @type {string}
          */
-        const encodedContractData = await L2LContract.methods.transfer(toAddress, amountInWei).encodeABI();
+        const encodedContractData = await L2LContract.methods.transfer(toAddress, amountInWei.toString()).encodeABI();
 
         /**
          * Estimate gas price for current transfer
          *
          * @type {BigNumber | number}
          */
-        const currentGasEstimation = await L2LContract.methods.transfer(toAddress,amountInWei).estimateGas();
+        const currentGasEstimation = parseFloat(await L2LContract.methods.transfer(toAddress,amountInWei.toString()).estimateGas());
 
         /**
          * Approve the transaction
          */
-        const transactionApproved = await L2LContract.methods.approve(toAddress, amountInWei).call();
+        const transactionApproved = await L2LContract.methods.approve(toAddress, amountInWei.toString()).call();
 
         /**
          * Defines the raw transaction object
@@ -111,6 +111,7 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
         if(currentGasEstimation > gas) {
             response.error.gas = `Gas too low.You have to set minim gas to: ${currentGasEstimation}`;
         } else if(senderBalance < amountInWei) {
+            console.log("Your token balance is too low : ", senderBalance, amountInWei, senderBalance < amountInWei);
             response.error.balance = "Your token balance is too low."
         } else if (!transactionApproved) {
             response.error.send = "Transaction is not approved";
