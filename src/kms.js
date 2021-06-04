@@ -7,22 +7,34 @@ const kms = new AWS.KMS({
   region: process.env.AWS_REGION,
 });
 
-// this is left here for testing purposes in the future
-function decryptKMS(encrypted) {
-  kms.decrypt(
-    {
-      KeyId: process.env.ENCRYPT_KEY_ID,
-      CiphertextBlob: Buffer.from(encrypted, "base64"),
-    },
-    (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        const decrypted = data.Plaintext.toString("ascii");
-        console.log({ decrypted });
+function decryptKMS(encrypted, accessKeyId, secretAccessKey) {
+  let kmsDecryptor = kms;
+  if (accessKeyId && secretAccessKey) {
+    kmsDecryptor = new AWS.KMS({
+      accessKeyId: accessKeyId,
+      secretAccessKey: secretAccessKey,
+      region: process.env.AWS_REGION,
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    kmsDecryptor.decrypt(
+      {
+        KeyId: process.env.ENCRYPT_KEY_ID,
+        CiphertextBlob: Buffer.from(encrypted, "base64"),
+      },
+      (err, data) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          const decrypted = data.Plaintext.toString("ascii");
+          console.log('Successfully decrypted with KMS');
+          resolve(decrypted);
+        }
       }
-    }
-  );
+    );
+  });
 }
 
 function encryptAndStoreToKMS(privateKey) {
@@ -46,4 +58,5 @@ function encryptAndStoreToKMS(privateKey) {
 
 module.exports = {
   encryptAndStoreToKMS,
+  decryptKMS
 };

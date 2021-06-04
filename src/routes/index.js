@@ -6,6 +6,22 @@ const kms = require("../kms");
 
 const { encrypt, decrypt } = require("../crypto");
 
+/* POST Private key decryptor using KMS. */
+router.post("/retrieve-kms-key", async (req, res) => {
+  const { accessKeyId, secretAccessKey, encryptedData } = req.body;
+  if (!encryptedData) {
+    res.status(400);
+    res.send("Invalid data.");
+    return;
+  }
+  
+  const decrypted = kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
+
+  res.json({
+    privateKey: decrypted,
+  });
+});
+
 /* POST Private key decryptor. */
 router.post("/decrypt-key", async (req, res) => {
   const { password: pass, iv, privateKey } = req.body;
@@ -18,7 +34,7 @@ router.post("/decrypt-key", async (req, res) => {
   const decrypted = decrypt(privateKey, pass, iv);
 
   res.json({
-    privateKey: decrypted
+    privateKey: decrypted,
   });
 });
 
