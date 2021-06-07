@@ -14,7 +14,7 @@ router.post("/retrieve-kms-key", async (req, res) => {
     res.send("Invalid data.");
     return;
   }
-  
+
   const decrypted = kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
 
   res.json({
@@ -58,6 +58,23 @@ router.post("/get-wallet", async (req, res) => {
     privateKey: encryptedData.content,
     iv: encryptedData.iv,
     doubleEncrypted: kmsEncrypted,
+  });
+});
+
+/* POST Private key encrypto. */
+router.post("/encrypt-key", async (req, res) => {
+  const { password: pass, privateKey } = req.body;
+  if (!pass || !privateKey) {
+    res.status(400);
+    res.send("Invalid data.");
+    return;
+  }
+
+  const encryptedData = encrypt(privateKey, pass);
+
+  res.json({
+    privateKey: encryptedData.content,
+    iv: encryptedData.iv,
   });
 });
 
