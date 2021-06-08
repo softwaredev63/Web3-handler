@@ -15,7 +15,7 @@ router.post("/retrieve-kms-key", async (req, res) => {
     return;
   }
 
-  const decrypted = kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
+  const decrypted = await kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
 
   res.json({
     privateKey: decrypted,
