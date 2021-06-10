@@ -153,7 +153,7 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
 const getUserBalance = async (senderAddress) => {
     let response = {
         balance: null,
-        error: {}
+        error: null
     };
 
     try {
@@ -167,20 +167,16 @@ const getUserBalance = async (senderAddress) => {
         /**
          * Get sender address balance
          */
-        const balanceInWei = BigInt(await L2LContract.methods.balanceOf(senderAddress).call());
+        const balanceInWei = await L2LContract.methods.balanceOf(senderAddress).call();
 
         /**
          * Converts from wei
          *
          * @type {BN}
          */
-        response.balance = BigInt(web3.utils.fromWei(balanceInWei, "ether")).toString();
+        response.balance = web3.utils.fromWei(balanceInWei, "ether");
     } catch (catchError) {
-        response.error.catch = catchError.message;
-    } finally {
-        if (Object.keys(response.error).length === 0) {
-            response.error = null;
-        }
+        response.error = catchError.message;
     }
 
     return response;
