@@ -15,7 +15,7 @@ router.post("/retrieve-kms-key", async (req, res) => {
     return;
   }
 
-  const decrypted = kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
+  const decrypted = await kms.decryptKMS(encryptedData, accessKeyId, secretAccessKey);
 
   res.json({
     privateKey: decrypted,
@@ -99,6 +99,18 @@ router.post("/send-token", async (req, res) => {
 
 router.get("/elb-status", (req, res) => {
   res.json({ everything: "OK" });
+});
+
+router.post("/get-balance", async (req, res) => {
+  const { sender_address } = req.body;
+  if (!sender_address) {
+    res.status(400);
+    res.send("Invalid data.");
+    return;
+  }
+
+  const balanceInfo = await wallet.getUserBalance(sender_address);
+  res.json(balanceInfo);
 });
 
 module.exports = router;
