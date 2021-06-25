@@ -1,37 +1,6 @@
 stages:
   - config
-  - build
   - deploy
-
-build_app:
-  stage: build
-  image: node:14-alpine3.13
-  script:
-  - npm install
-  cache:
-    key: "node_modules"
-    paths:
-      - node_modules/
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - .
-  only:
-  - staging
-
-deploy:
-  stage: deploy
-  script:
-    - . /opt/scripts/before.sh
-    - . /opt/scripts/deploy.sh
-    - . /opt/scripts/after.sh
-  dependencies:
-    - build_app
-  tags:
-    - deploy_lnx_multi_runner
-  only:
-    - staging
-
 
 aws-get-docker-login:
   script:
@@ -51,21 +20,23 @@ aws-get-docker-login:
   tags:
   - aws-cli
   only:
+  - staging
   - master
 
 docker-api-aws-push:
   dependencies:
   - aws-get-docker-login
   script:
-  - docker build -t 2local-node .
+  - docker build -t 2local-node:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID .
   - ""
   - . ./aws-docker-repository-login-command
-  - docker tag 2local-node:latest 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:latest
-  - docker push 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:latest
+  - docker tag 2local-node:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
+  - docker push 931280344517.dkr.ecr.eu-west-1.amazonaws.com/2local-node:$CI_COMMIT_REF_NAME-$CI_PIPELINE_ID
   stage: deploy
   services:
   - docker:dind
   tags:
   - docker-in-docker
   only:
+  - staging
   - master
