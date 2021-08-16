@@ -145,7 +145,52 @@ const sendTokenToUser = async (sender_private_key, toAddress, amount, gas) => {
     return response;
 }
 
+/**
+ * Get user balance.
+ * @param senderAddress
+ * @returns {Promise<{error: {}, balance: null}>}
+ */
+const getUserBalance = async (senderAddress) => {
+    let response = {
+        balance2lc: null,
+        balanceBnb: null,
+        error: null
+    };
+
+    try {
+        /**
+         * Defines the token contract
+         *
+         * @type {Contract}
+         */
+        const L2LContract = new web3.eth.Contract(l2lContractABI, contractAddress);
+
+        /**
+         * Get sender address balance
+         */
+        const balance2lcInWei = await L2LContract.methods.balanceOf(senderAddress).call();
+
+        /**
+         * Get sender address balance
+         */
+        const balanceBnbInWei = await web3.eth.getBalance(senderAddress);
+
+        /**
+         * Converts from wei
+         *
+         * @type {BN}
+         */
+        response.balance2lc = web3.utils.fromWei(balance2lcInWei, "ether");
+        response.balanceBnb = web3.utils.fromWei(balanceBnbInWei, "ether");
+    } catch (catchError) {
+        response.error = catchError.message;
+    }
+
+    return response;
+}
+
 module.exports = {
     generateWallet,
-    sendTokenToUser
+    sendTokenToUser,
+    getUserBalance,
 };
